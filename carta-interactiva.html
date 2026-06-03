@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para ti 💌</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&family=Allura&family=Parisienne&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background: #000000;
+    font-family: 'Cormorant Garamond', serif;
+    overflow-x: hidden;
+    position: relative;
+    color: #2c1810;
+  }
+
+  /* ===== PARTÍCULAS DE FONDO ===== */
+  .particulas-fondo {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 1;
+  }
+  .particula-bg {
+    position: absolute; border-radius: 50%;
+    animation: flotarBg linear infinite;
+  }
+  @keyframes flotarBg {
+    0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.6; }
+    100% { transform: translateY(-20px) translateX(50px); opacity: 0; }
+  }
+
+  /* ===== INTRO ===== */
+  #intro {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; z-index: 100;
+    background: #000000;
+    transition: opacity 1.5s ease;
+  }
+  #intro.hidden { opacity: 0; pointer-events: none; }
+
+  .contenedor-sobre {
+    position: relative;
+    width: 340px; height: 240px;
+    cursor: pointer;
+    perspective: 1200px;
+  }
+
+  /* La carta (hoja) dentro del sobre */
+  .hoja-carta {
+    position: absolute;
+    top: 8px; left: 10px;
+    width: 320px; height: 180px;
+    background: linear-gradient(135deg, #f4e4c1 0%, #e8d5a0 50%, #d4b88a 100%);
+    border-radius: 2px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+    z-index: 2;
+    transform-origin: bottom center;
+    transition: transform 1.8s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 1s;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(139, 90, 43, 0.15) 0%, transparent 40%),
+      radial-gradient(circle at 70% 60%, rgba(139, 90, 43, 0.2) 0%, transparent 40%),
+      radial-gradient(circle at 40% 80%, rgba(160, 100, 50, 0.1) 0%, transparent 30%),
+      linear-gradient(135deg, #f4e4c1 0%, #e8d5a0 50%, #d4b88a 100%);
+  }
+  /* Bordes muy quemados */
+  .hoja-carta::before {
+    content: ''; position: absolute; top: -4px; left: -4px; right: -4px; bottom: -4px;
+    background:
+      radial-gradient(ellipse at top left, transparent 30%, rgba(40, 15, 5, 0.85) 100%),
+      radial-gradient(ellipse at top right, transparent 25%, rgba(40, 15, 5, 0.9) 100%),
+      radial-gradient(ellipse at bottom left, transparent 35%, rgba(40, 15, 5, 0.8) 100%),
+      radial-gradient(ellipse at bottom right, transparent 30%, rgba(40, 15, 5, 0.88) 100%),
+      radial-gradient(ellipse at top center, transparent 70%, rgba(60, 20, 5, 0.5) 100%),
+      radial-gradient(ellipse at bottom center, transparent 75%, rgba(60, 20, 5, 0.4) 100%),
+      radial-gradient(ellipse at left center, transparent 75%, rgba(60, 20, 5, 0.45) 100%),
+      radial-gradient(ellipse at right center, transparent 75%, rgba(60, 20, 5, 0.45) 100%);
+    border-radius: 2px;
+    pointer-events: none;
+    filter: blur(2px);
+  }
+  /* Manchas de quemado grandes */
+  .hoja-carta::after {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background-image:
+      radial-gradient(circle at 5% 10%, rgba(20, 5, 0, 0.7) 0%, transparent 12%),
+      radial-gradient(circle at 95% 15%, rgba(20, 5, 0, 0.65) 0%, transparent 10%),
+      radial-gradient(circle at 8% 90%, rgba(20, 5, 0, 0.6) 0%, transparent 11%),
+      radial-gradient(circle at 92% 88%, rgba(20, 5, 0, 0.7) 0%, transparent 13%),
+      radial-gradient(circle at 50% 5%, rgba(60, 30, 10, 0.3) 0%, transparent 8%),
+      radial-gradient(circle at 50% 95%, rgba(60, 30, 10, 0.25) 0%, transparent 7%);
+    border-radius: 2px;
+    pointer-events: none;
+  }
+
+  .contenedor-sobre.abierto .hoja-carta {
+    transform: translateY(-140px) scale(0.95);
+  }
+  .contenedor-sobre.quemado .hoja-carta {
+    animation: quemarse 2s ease-out forwards;
+  }
+  @keyframes quemarse {
+    0% { transform: translateY(-140px) scale(0.95); opacity: 1; filter: brightness(1); }
+    20% { filter: brightness(1.2) sepia(0.3); }
+    50% { filter: brightness(0.8) sepia(0.8) contrast(1.2); }
+    80% { filter: brightness(0.4) sepia(1) contrast(1.5); opacity: 0.6; }
+    100% { filter: brightness(0) sepia(1) contrast(2); opacity: 0; transform: translateY(-200px) scale(0.7) rotate(8deg); }
+  }
+
+  /* Sobre (cuerpo) */
+  .sobre-cuerpo {
+    position: absolute; bottom: 0; width: 100%; height: 150px;
+    background: linear-gradient(135deg, #6b2c2c 0%, #4a1c1c 50%, #3a1414 100%);
+    border-radius: 4px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    border: 1px solid #2a0e0e;
+    z-index: 4;
+  }
+  .sobre-tapa {
+    position: absolute; top: 0; width: 100%; height: 0;
+    border-left: 170px solid transparent;
+    border-right: 170px solid transparent;
+    border-top: 120px solid #5a2424;
+    transform-origin: top;
+    transition: transform 1.2s ease;
+    z-index: 6;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+  }
+  .contenedor-sobre.abierto .sobre-tapa {
+    transform: rotateX(180deg);
+  }
+  .sello {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    width: 60px; height: 60px;
+    background: radial-gradient(circle, #8b1a1a 0%, #4a0e0e 80%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Great Vibes', cursive;
+    font-size: 30px; color: #f4d4a0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.6), inset 0 0 10px rgba(255,255,255,0.15);
+    border: 2px dashed rgba(244, 212, 160, 0.3);
+    transition: opacity 0.5s, transform 0.5s;
+  }
+  .contenedor-sobre.abierto .sello { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+
+  /* Texto de la hoja mientras está dentro */
+  .texto-hoja {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Great Vibes', cursive;
+    font-size: 24px;
+    color: #5a2424;
+    text-align: center;
+    z-index: 3;
+    opacity: 0;
+    transition: opacity 0.5s;
+    pointer-events: none;
+  }
+  .contenedor-sobre.abierto .texto-hoja { opacity: 1; }
+
+  /* Brasas que caen */
+  .brasa {
+    position: absolute;
+    width: 6px; height: 6px;
+    background: radial-gradient(circle, #ffeb3b 0%, #ff9800 40%, #d32f2f 100%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 50;
+    box-shadow: 0 0 10px #ff9800, 0 0 20px #ff5722;
+    animation: brasaCaer linear forwards;
+  }
+  @keyframes brasaCaer {
+    0% { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+  }
+  .humo {
+    position: absolute;
+    width: 20px; height: 20px;
+    background: radial-gradient(circle, rgba(150, 150, 150, 0.4) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 49;
+    animation: humoSubir linear forwards;
+  }
+  @keyframes humoSubir {
+    0% { transform: translate(0, 0) scale(0.5); opacity: 0.6; }
+    100% { transform: translate(var(--tx), var(--ty)) scale(3); opacity: 0; }
+  }
+
+  .intro-texto {
+    margin-top: 50px;
+    font-family: 'Great Vibes', cursive;
+    font-size: 42px;
+    color: #c97070;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  }
+  .intro-sub {
+    color: #8a5555;
+    font-size: 16px;
+    margin-top: 10px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+  }
+
+  /* ===== CARTA PRINCIPAL ===== */
+  #carta {
+    display: none; min-height: 100vh;
+    padding: 50px 20px; position: relative; z-index: 10;
+  }
+  #carta.visible { display: block; animation: aparecer 2s ease; }
+  @keyframes aparecer { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  .papel-carta {
+    max-width: 720px; margin: 0 auto;
+    background: linear-gradient(135deg, #fdf6e3 0%, #faf0d4 50%, #f7ebc8 100%);
+    border-radius: 4px;
+    padding: 55px 50px 55px 65px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    border: 1px solid #c9b78a;
+    border-left: 3px solid rgba(139, 30, 30, 0.4);
+    position: relative;
+    /* Bordes muy destruidos */
+    clip-path: polygon(
+      0% 2%, 1% 0.5%, 2.5% 1.5%, 4% 0%, 6% 1%, 9% 0.2%, 12% 0.8%, 16% 0%, 20% 1.2%, 25% 0.3%, 30% 0%, 35% 0.9%, 40% 0.2%, 45% 0.7%, 50% 0%, 55% 1.1%, 60% 0.4%, 65% 0.9%, 70% 0%, 75% 0.6%, 80% 0.2%, 85% 1%, 90% 0%, 94% 0.8%, 97% 0.3%, 99% 0%, 100% 1.5%,
+      99% 4%, 100% 7%, 99.2% 12%, 100% 17%, 99.5% 22%, 99.8% 28%, 100% 35%, 99.3% 42%, 100% 50%, 99.5% 58%, 100% 65%, 99.2% 72%, 100% 78%, 99.5% 84%, 100% 90%, 99.3% 95%, 100% 98%,
+      98% 100%, 95% 99.2%, 91% 100%, 87% 99.5%, 82% 100%, 77% 99.3%, 72% 100%, 66% 99.6%, 60% 100%, 54% 99.2%, 48% 100%, 42% 99.5%, 36% 100%, 30% 99.3%, 24% 100%, 18% 99.5%, 12% 100%, 7% 99.2%, 3% 100%, 0% 99.5%,
+      0.5% 95%, 0% 90%, 0.7% 84%, 0% 78%, 0.4% 72%, 0% 65%, 0.8% 58%, 0% 50%, 0.3% 42%, 0% 35%, 0.9% 28%, 0% 22%, 0.4% 17%, 0% 12%, 0.7% 7%, 0% 4%
+    );
+  }
+  .papel-carta::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: repeating-linear-gradient(
+      transparent, transparent 31px, rgba(180, 140, 100, 0.22) 31px, rgba(180, 140, 100, 0.22) 32px
+    );
+    pointer-events: none; z-index: 1;
+  }
+  .papel-carta::after {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image:
+      /* Esquinas muy quemadas */
+      radial-gradient(ellipse at 0% 0%, rgba(20, 5, 0, 0.85) 0%, rgba(40, 15, 5, 0.5) 8%, transparent 18%),
+      radial-gradient(ellipse at 100% 0%, rgba(20, 5, 0, 0.9) 0%, rgba(40, 15, 5, 0.55) 9%, transparent 20%),
+      radial-gradient(ellipse at 0% 100%, rgba(20, 5, 0, 0.85) 0%, rgba(40, 15, 5, 0.5) 8%, transparent 18%),
+      radial-gradient(ellipse at 100% 100%, rgba(20, 5, 0, 0.9) 0%, rgba(40, 15, 5, 0.55) 9%, transparent 20%),
+      /* Bordes quemados */
+      radial-gradient(ellipse at 50% 0%, transparent 75%, rgba(60, 25, 5, 0.6) 100%),
+      radial-gradient(ellipse at 50% 100%, transparent 75%, rgba(60, 25, 5, 0.6) 100%),
+      radial-gradient(ellipse at 0% 50%, transparent 80%, rgba(60, 25, 5, 0.5) 100%),
+      radial-gradient(ellipse at 100% 50%, transparent 80%, rgba(60, 25, 5, 0.5) 100%),
+      /* Manchas dispersas */
+      radial-gradient(circle at 8% 15%, rgba(20, 5, 0, 0.4) 0%, transparent 4%),
+      radial-gradient(circle at 92% 22%, rgba(20, 5, 0, 0.45) 0%, transparent 5%),
+      radial-gradient(circle at 12% 78%, rgba(20, 5, 0, 0.4) 0%, transparent 4%),
+      radial-gradient(circle at 88% 82%, rgba(20, 5, 0, 0.5) 0%, transparent 5%),
+      radial-gradient(circle at 25% 50%, rgba(60, 30, 10, 0.2) 0%, transparent 3%),
+      radial-gradient(circle at 75% 45%, rgba(60, 30, 10, 0.18) 0%, transparent 3%),
+      /* Textura general */
+      radial-gradient(circle at 10% 20%, rgba(139, 90, 43, 0.06) 0%, transparent 2%),
+      radial-gradient(circle at 80% 50%, rgba(139, 90, 43, 0.06) 0%, transparent 2%),
+      radial-gradient(circle at 30% 70%, rgba(139, 90, 43, 0.05) 0%, transparent 2%);
+    pointer-events: none; z-index: 1;
+  }
+
+  .titulo {
+    font-family: 'Great Vibes', cursive;
+    font-size: 52px;
+    color: #8b1a1a;
+    text-align: center;
+    margin-bottom: 35px;
+    position: relative;
+    z-index: 2;
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.3);
+  }
+  .titulo::after {
+    content: '~ ❦ ~';
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    color: #8b6f47;
+    margin-top: 8px;
+    letter-spacing: 4px;
+  }
+
+  .parrafo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px;
+    font-weight: 500;
+    line-height: 1.85;
+    color: #2c1810;
+    margin-bottom: 24px;
+    text-align: justify;
+    opacity: 0;
+    transform: translateY(15px);
+    transition: opacity 1.2s ease, transform 1.2s ease;
+    position: relative;
+    z-index: 2;
+    text-indent: 25px;
+  }
+  .parrafo.visible { opacity: 1; transform: translateY(0); }
+  .parrafo::first-letter {
+    font-family: 'Great Vibes', cursive;
+    font-size: 40px;
+    color: #8b1a1a;
+    font-weight: 700;
+    line-height: 0.9;
+  }
+  .subrayado {
+    background-image: linear-gradient(transparent 88%, rgba(139, 26, 26, 0.35) 88%, rgba(139, 26, 26, 0.35) 95%, transparent 95%);
+    padding: 0 2px;
+  }
+
+  /* ===== SECRETOS ===== */
+  .secreto {
+    display: inline-block;
+    cursor: pointer;
+    vertical-align: middle;
+    margin: 0 3px;
+    transition: transform 0.3s;
+    position: relative;
+  }
+  .secreto:hover { transform: scale(1.2) rotate(5deg); }
+  .secreto .mensaje {
+    position: absolute;
+    bottom: 130%;
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+    background: linear-gradient(135deg, #8b1a1a 0%, #5a0e0e 100%);
+    color: #f4d4a0;
+    padding: 8px 18px;
+    border-radius: 12px;
+    font-family: 'Great Vibes', cursive;
+    font-size: 20px;
+    white-space: nowrap;
+    z-index: 50;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    transform-origin: bottom center;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+  }
+  .secreto .mensaje::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 7px solid transparent;
+    border-top-color: #5a0e0e;
+  }
+  .secreto.abierto .mensaje { transform: translateX(-50%) scale(1); }
+
+  /* ===== JUEGO - ESTILO ANTIGUO ===== */
+  .juego-seccion {
+    margin-top: 55px;
+    padding: 35px 25px;
+    background:
+      linear-gradient(135deg, rgba(244, 228, 193, 0.7) 0%, rgba(212, 184, 138, 0.5) 100%);
+    border-radius: 6px;
+    text-align: center;
+    border: 2px solid #8b6f47;
+    position: relative;
+    z-index: 2;
+    box-shadow: inset 0 0 30px rgba(139, 90, 43, 0.15);
+  }
+  .juego-seccion::before {
+    content: '❦';
+    position: absolute;
+    top: -18px; left: 50%;
+    transform: translateX(-50%);
+    background: #fdf6e3;
+    padding: 0 12px;
+    font-size: 22px;
+    color: #8b1a1a;
+  }
+  .juego-titulo {
+    font-family: 'Great Vibes', cursive;
+    font-size: 38px;
+    color: #8b1a1a;
+    margin-bottom: 10px;
+  }
+  .juego-desc {
+    color: #5a3818;
+    margin-bottom: 22px;
+    font-size: 16px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+  }
+  .juego-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    max-width: 380px;
+    margin: 0 auto 20px;
+  }
+  .casilla {
+    aspect-ratio: 1;
+    background: linear-gradient(135deg, #6b2c2c 0%, #4a1c1c 100%);
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    color: transparent;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3), inset 0 0 15px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+    border: 1px solid #3a1414;
+  }
+  .casilla:hover { transform: translateY(-2px) rotate(-3deg); box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
+  .casilla.revelada { color: inherit; }
+  .casilla.medusa {
+    background: linear-gradient(135deg, #c97070 0%, #8b1a1a 100%);
+    color: #f4d4a0;
+    animation: aparecer 0.6s;
+    box-shadow: 0 0 20px rgba(201, 112, 112, 0.5);
+  }
+  .juego-contador {
+    font-family: 'Great Vibes', cursive;
+    font-size: 22px;
+    color: #5a2424;
+  }
+  .juego-gano {
+    display: none;
+    margin-top: 18px;
+    font-family: 'Great Vibes', cursive;
+    font-size: 30px;
+    color: #8b1a1a;
+  }
+  .juego-gano.visible { display: block; animation: aparecer 1s; }
+  .btn-final {
+    display: none;
+    margin: 20px auto 0;
+    padding: 12px 30px;
+    background: linear-gradient(135deg, #8b1a1a 0%, #5a0e0e 100%);
+    color: #f4d4a0;
+    border: 2px solid #5a0e0e;
+    border-radius: 30px;
+    font-family: 'Great Vibes', cursive;
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+  }
+  .btn-final:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+  .btn-final.visible { display: inline-block; animation: aparecer 1s; }
+
+  /* ===== MENSAJE FINAL ===== */
+  .mensaje-final {
+    margin-top: 45px;
+    padding: 35px;
+    background: linear-gradient(135deg, #fef0e0 0%, #fde2d0 100%);
+    border-radius: 6px;
+    text-align: center;
+    border: 2px solid #8b6f47;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 1.5s, transform 1.5s;
+    position: relative;
+    z-index: 2;
+    box-shadow: inset 0 0 30px rgba(139, 90, 43, 0.1);
+  }
+  .mensaje-final.visible {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+  }
+  .mensaje-final::before {
+    content: '❦';
+    position: absolute; top: -18px; left: 50%;
+    transform: translateX(-50%);
+    background: #fdf6e3;
+    padding: 0 12px;
+    font-size: 22px;
+    color: #8b1a1a;
+  }
+  .mensaje-final h2 {
+    font-family: 'Great Vibes', cursive;
+    font-size: 44px;
+    color: #8b1a1a;
+    margin-bottom: 15px;
+  }
+  .mensaje-final p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px;
+    color: #2c1810;
+    line-height: 1.8;
+    font-style: italic;
+  }
+
+  .firma {
+    text-align: right;
+    font-family: 'Great Vibes', cursive;
+    font-size: 36px;
+    color: #8b1a1a;
+    margin-top: 35px;
+    opacity: 0;
+    transition: opacity 1.2s;
+    position: relative;
+    z-index: 2;
+  }
+  .firma.visible { opacity: 1; }
+  .firma::after {
+    content: '';
+    display: block;
+    width: 160px; height: 1px;
+    background: linear-gradient(90deg, transparent 0%, #8b1a1a 100%);
+    margin: 6px 0 0 auto;
+  }
+
+  @media (max-width: 600px) {
+    .papel-carta { padding: 35px 25px 35px 35px; }
+    .titulo { font-size: 38px; }
+    .parrafo { font-size: 16px; text-indent: 15px; }
+    .contenedor-sobre { transform: scale(0.85); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Partículas de fondo -->
+<div class="particulas-fondo" id="particulasFondo"></div>
+
+<!-- ===== INTRO ===== -->
+<div id="intro">
+  <div class="contenedor-sobre" id="sobre" onclick="abrirSobre()">
+    <div class="hoja-carta">
+      <div class="texto-hoja">Mi más sincera</div>
+    </div>
+    <div class="sobre-cuerpo"></div>
+    <div class="sobre-tapa"></div>
+    <div class="sello">I</div>
+  </div>
+  <div class="intro-texto">Para ti</div>
+  <div class="intro-sub">toca el sobre para abrirlo</div>
+</div>
+
+<!-- ===== CARTA ===== -->
+<div id="carta">
+  <div class="papel-carta">
+
+    <h1 class="titulo">Para ti, con todo mi corazón</h1>
+
+    <p class="parrafo" data-delay="400">
+      Bueno, normalmente no haría algo como esto, pero algo me dijo que usted se merecía un detalle así… así que aquí estoy.
+      <span class="secreto" onclick="toggleSecreto(this)">🪼<span class="mensaje">✦ sincero ✦</span></span>
+    </p>
+
+    <p class="parrafo" data-delay="900">
+      No sé cuándo vaya a leer esto, pero iré al grano. Nunca he sido bueno expresando este tipo de cosas y precisamente por eso casi no las hago, pero sentí que esta era una bonita forma de decirle cosas que a veces no logro expresar ni en persona ni por mensaje.
+      <span class="secreto" onclick="toggleSecreto(this)">🪷<span class="mensaje">✦ para ti ✦</span></span>
+    </p>
+
+    <p class="parrafo" data-delay="1400">
+      Antes de conocerla sentía mi vida muy <span class="subrayado">monótona</span>, muy rutinaria, como si todos los días fueran exactamente iguales. Y sinceramente, desde que <span class="subrayado">usted apareció</span>, algo cambió en mí. Tal vez suene exagerado, pero conocerla le dio algo diferente a mis días.
+      <span class="secreto" onclick="toggleSecreto(this)">🪼<span class="mensaje">✦ algo cambió ✦</span></span>
+      <span class="secreto" onclick="toggleSecreto(this)">🪷<span class="mensaje">✦ en mí ✦</span></span>
+    </p>
+
+    <p class="parrafo" data-delay="1900">
+      Sé que todavía conozco muy poco de usted, pero aun así me parece una persona <span class="subrayado">sumamente interesante, admirable y muy especial</span>. Me gusta la manera en la que habla, la manera en la que piensa y hasta esas pequeñas cosas que me ha contado de usted. Sé que le gustan los deportes, los perros y las medusas… y aunque parezcan detalles simples, me gusta escucharlos porque vienen de usted.
+      <span class="secreto" onclick="toggleSecreto(this)">🪼<span class="mensaje">✦ me gusta escucharla ✦</span></span>
+    </p>
+
+    <p class="parrafo" data-delay="2400">
+      El día que la conocí en persona fui <span class="subrayado">realmente feliz</span>, porque confirmé que además de ser una mujer muy hermosa, también es alguien con una vibra muy bonita y una forma de ser que sinceramente <span class="subrayado">admiro mucho</span>.
+      <span class="secreto" onclick="toggleSecreto(this)">🪷<span class="mensaje">✦ la admiro ✦</span></span>
+    </p>
+
+    <p class="parrafo" data-delay="2900">
+      Y aunque todavía nos falta muchísimo por conocernos, la verdad sí <span class="subrayado">quiero seguir haciéndolo</span>. Quiero seguir descubriendo poco a poco quién es usted, porque lo poco que he conocido ya ha influido muchísimo en mí. De alguna manera, usted ha logrado <span class="subrayado">sacar una mejor versión de mí</span> y eso es algo que valoro muchísimo.
+      <span class="secreto" onclick="toggleSecreto(this)">🪼<span class="mensaje">✦ quiero seguir ✦</span></span>
+      <span class="secreto" onclick="toggleSecreto(this)">🪷<span class="mensaje">✦ conociéndola ✦</span></span>
+    </p>
+
+    <p class="parrafo" data-delay="3400">
+      Solo quería que supiera eso.
+    </p>
+
+    <p class="firma">Con cariño</p>
+
+    <!-- ===== JUEGO ===== -->
+    <div class="juego-seccion">
+      <div class="juego-titulo">Un pequeño juego</div>
+      <p class="juego-desc">Encuentra las 5 medusas escondidas.</p>
+      <div class="juego-grid" id="juegoGrid"></div>
+      <div class="juego-contador">Medusas halladas: <span id="contador">0</span> de 5</div>
+      <div class="juego-gano" id="juegoGano">❦ Lo lograste ❦</div>
+      <button class="btn-final" id="btnFinal" onclick="mostrarFinal()">Ver mensaje final</button>
+    </div>
+
+    <!-- ===== FINAL ===== -->
+    <div class="mensaje-final" id="mensajeFinal">
+      <h2>Una última cosa...</h2>
+      <p>
+        Si estás leyendo esto, significa que te tomaste el tiempo de abrir cada detalle, de leer cada palabra y de jugar con las medusas. Y eso, sinceramente, me hace muy feliz. Porque demuestra que eres exactamente la persona especial que siempre supe que eras. Gracias por existir y por permitirme compartir esto contigo.
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ===== PARTÍCULAS DE FONDO =====
+  const particulasFondo = document.getElementById('particulasFondo');
+  function crearParticulaFondo() {
+    const p = document.createElement('div');
+    p.className = 'particula-bg';
+    const size = 2 + Math.random() * 4;
+    const colores = [
+      'rgba(201, 112, 112, 0.6)',
+      'rgba(139, 26, 26, 0.5)',
+      'rgba(212, 184, 138, 0.5)',
+      'rgba(244, 212, 160, 0.4)',
+      'rgba(255, 200, 150, 0.5)'
+    ];
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    p.style.background = colores[Math.floor(Math.random() * colores.length)];
+    p.style.left = Math.random() * 100 + '%';
+    p.style.boxShadow = '0 0 ' + (size*3) + 'px ' + p.style.background;
+    p.style.animationDuration = (15 + Math.random() * 20) + 's';
+    particulasFondo.appendChild(p);
+    setTimeout(() => p.remove(), 35000);
+  }
+  setInterval(crearParticulaFondo, 400);
+  for (let i = 0; i < 15; i++) setTimeout(crearParticulaFondo, i * 100);
+
+  // ===== ABRIR SOBRE =====
+  function abrirSobre() {
+    const sobre = document.getElementById('sobre');
+    sobre.classList.add('abierto');
+
+    // Después de que la carta se eleva, se quema
+    setTimeout(() => {
+      const rect = sobre.getBoundingClientRect();
+      const cx = rect.left + rect.width/2;
+      const cy = rect.top + rect.height/2;
+
+      // Brasas
+      for (let i = 0; i < 40; i++) {
+        const brasa = document.createElement('div');
+        brasa.className = 'brasa';
+        brasa.style.left = (cx - 3) + 'px';
+        brasa.style.top = (cy - 60) + 'px';
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 100 + Math.random() * 200;
+        brasa.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+        brasa.style.setProperty('--ty', Math.sin(angle) * dist + 50 + 'px');
+        brasa.style.animationDuration = (1 + Math.random() * 1.5) + 's';
+        document.body.appendChild(brasa);
+        setTimeout(() => brasa.remove(), 2500);
+      }
+      // Humo
+      for (let i = 0; i < 20; i++) {
+        const humo = document.createElement('div');
+        humo.className = 'humo';
+        humo.style.left = (cx - 10) + 'px';
+        humo.style.top = (cy - 80) + 'px';
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 30 + Math.random() * 80;
+        humo.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+        humo.style.setProperty('--ty', -100 - Math.random() * 200 + 'px');
+        humo.style.animationDuration = (2 + Math.random() * 2) + 's';
+        document.body.appendChild(humo);
+        setTimeout(() => humo.remove(), 4000);
+      }
+
+      sobre.classList.add('quemado');
+    }, 1800);
+
+    setTimeout(() => {
+      document.getElementById('intro').classList.add('hidden');
+      const c = document.getElementById('carta');
+      c.classList.add('visible');
+      mostrarParrafos();
+    }, 4200);
+  }
+
+  // ===== PÁRRAFOS =====
+  function mostrarParrafos() {
+    document.querySelectorAll('.parrafo').forEach(p => {
+      const d = parseInt(p.dataset.delay) || 0;
+      setTimeout(() => p.classList.add('visible'), d);
+    });
+    setTimeout(() => document.querySelector('.firma').classList.add('visible'), 4200);
+  }
+
+  // ===== SECRETOS =====
+  function toggleSecreto(el) {
+    el.classList.toggle('abierto');
+    if (el.classList.contains('abierto')) {
+      setTimeout(() => el.classList.remove('abierto'), 3500);
+    }
+  }
+
+  // ===== JUEGO =====
+  const grid = document.getElementById('juegoGrid');
+  const simbolos = ['🪼','🌊','🪷','⭐','🌸','🪼','🐚','🌺','🪼','✨','🌼','🪼','🍃','🌷','🪼','💫'];
+  let halladas = 0;
+  simbolos.sort(() => Math.random() - 0.5).forEach(sim => {
+    const c = document.createElement('div');
+    c.className = 'casilla';
+    c.textContent = '?';
+    c.onclick = () => {
+      if (c.classList.contains('revelada')) return;
+      c.classList.add('revelada');
+      c.textContent = sim;
+      if (sim === '🪼') {
+        c.classList.add('medusa');
+        halladas++;
+        document.getElementById('contador').textContent = halladas;
+        if (halladas === 5) {
+          setTimeout(() => {
+            document.getElementById('juegoGano').classList.add('visible');
+            document.getElementById('btnFinal').classList.add('visible');
+          }, 500);
+        }
+      } else {
+        setTimeout(() => { c.classList.remove('revelada'); c.textContent = '?'; }, 800);
+      }
+    };
+    grid.appendChild(c);
+  });
+
+  // Mostrar mensaje final
+  function mostrarFinal() {
+    const m = document.getElementById('mensajeFinal');
+    m.classList.add('visible');
+    m.style.opacity = '1';
+    m.style.transform = 'scale(1)';
+    // Forzar scroll al mensaje
+    setTimeout(() => {
+      m.scrollIntoView({behavior: 'smooth', block: 'start'});
+    }, 100);
+  }
+</script>
+
+</body>
+</html>
